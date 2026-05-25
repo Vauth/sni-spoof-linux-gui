@@ -39,6 +39,11 @@ Configuration is stored in `config.json` in the same directory. If the file is m
 
 <br>
 
+## 📷 Screenshot
+<a href="#Screenshot"><img src="https://github.com/user-attachments/assets/33039128-00e5-4e75-bf8e-7b78744db0ff" width="600px"></a>
+
+<br>
+
 ## 🧪 Troubleshooting
 - **Core binary missing**: Ensure `sni-spoof-linux-<arch>` is in the same directory and is executable.
 - **No permission to start**: Verify `pkexec` is available (`policykit-1` package) and that you approve the prompt.
