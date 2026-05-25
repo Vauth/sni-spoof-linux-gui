@@ -1,0 +1,68 @@
+name: Build and Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-22.04
+            binary_url: https://github.com/Vauth/sni-spoof/releases/download/v0.1.0/sni-spoof-linux-amd64
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+            binary_url: https://github.com/Vauth/sni-spoof/releases/download/v0.1.0/sni-spoof-linux-arm64
+
+    runs-on: ${{ matrix.runner }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt
+
+      - name: Download core binary
+        run: |
+          curl -L "${{ matrix.binary_url }}" -o "sni-spoof-linux-${{ matrix.arch }}"
+          chmod +x "sni-spoof-linux-${{ matrix.arch }}"
+
+      - name: Build GUI
+        run: |
+          # Added --windowed to prevent terminal-dependency crashes
+          pyinstaller --onefile --windowed --name sni-spoof-gui main.py
+
+      - name: Release Archive
+        run: |
+          mkdir -p package
+          cp "sni-spoof-linux-${{ matrix.arch }}" package/
+          cp dist/sni-spoof-gui package/
+          tar -czvf sni-spoof-linux-${{ matrix.arch }}.tar.gz -C package .
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sni-spoof-linux-${{ matrix.arch }}
+          path: sni-spoof-linux-${{ matrix.arch }}.tar.gz
+
+      - name: Publish Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: sni-spoof-linux-${{ matrix.arch }}.tar.gz
