@@ -12,6 +12,7 @@ A small PySide6 desktop UI for running the **sni-spoof** core binary on Linux.
 <br>
 
 ## ⚙️ Requirements
+- Linux (arm64, amd64)
 - Python 3.10+
 - Core binary
 
@@ -30,6 +31,7 @@ Configuration is stored in `config.json` in the same directory. If the file is m
   "FAKE_SNI": "www.hcaptcha.com"
 }
 ```
+Point your client (xray, etc.) at `LISTEN_HOST:LISTEN_PORT` instead of the real upstream.
 
 <br>
 
